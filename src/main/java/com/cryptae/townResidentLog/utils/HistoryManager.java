@@ -1,4 +1,4 @@
-package com.cryptae.townResidentLog;
+package com.cryptae.townResidentLog.utils;
 
 import java.util.ArrayList;
 import java.util.List;

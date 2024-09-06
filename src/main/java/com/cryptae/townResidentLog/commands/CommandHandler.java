@@ -1,28 +1,29 @@
-package com.cryptae.townResidentLog;
+package com.cryptae.townResidentLog.commands;
 
+import com.cryptae.townResidentLog.utils.HistoryManager;
+import com.cryptae.townResidentLog.utils.ResidentLogEntry;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.Resident;
-import com.palmergames.bukkit.towny.TownyUniverse;
+import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class CommandHandler implements CommandExecutor {
 
-    private final TownResidentLog plugin;
+    private final Towny plugin;
 
-    public CommandHandler(TownResidentLog plugin) {
+    public CommandHandler(Towny plugin) {
         this.plugin = plugin;
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "Only players can use this command.");
             return false;
@@ -36,18 +37,22 @@ public class CommandHandler implements CommandExecutor {
         }
 
         if (args[0].equalsIgnoreCase("residentlog") || args[0].equalsIgnoreCase("reslog")) {
-            Resident resident = TownyUniverse.getDataSource().getResident(player.getUniqueId()).orElse(null);
+            try {
+                Resident resident = Towny.getResident(player.getUniqueId());
 
-            if (resident == null || !resident.hasTown()) {
-                player.sendMessage(ChatColor.RED + "You are not in a town.");
+                if (resident == null || !resident.hasTown()) {
+                    player.sendMessage(ChatColor.RED + "You are not in a town.");
+                    return false;
+                }
+
+                Town town = resident.getTown();
+                displayResidentLog(town, player);
+                return true;
+            } catch (NotRegisteredException e) {
+                player.sendMessage(ChatColor.RED + "Error retrieving town data.");
+                e.printStackTrace();
                 return false;
             }
-
-            Town town = resident.getTown();
-
-            // Fetch and display the resident log here
-            displayResidentLog(town, player);
-            return true;
         }
 
         player.sendMessage(ChatColor.RED + "Invalid command usage.");

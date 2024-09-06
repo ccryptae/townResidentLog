@@ -1,4 +1,4 @@
-package com.cryptae.townResidentLog;
+package com.cryptae.townResidentLog.utils;
 
 public class ResidentLogEntry {
     private final String townName;
