@@ -1,0 +1,4 @@
+name: townResidentLog
+version: '1.0'
+main: com.cryptae.townResidentLog.TownResidentLog
+api-version: '1.20'
